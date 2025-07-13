@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings
 
 
 class EmailProvider(Enum):
-    OUTLOOK = "outlook"
+    GMAIL = "gmail"
 
 
 class EmailConfig(BaseSettings):
@@ -16,7 +16,6 @@ class EmailConfig(BaseSettings):
 
 class LlmProvider(Enum):
     GOOGLE_GENAI = "google_genai"
-    OPENAI = "openai"
 
 
 class LlmConfig(BaseSettings):

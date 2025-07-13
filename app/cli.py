@@ -1,6 +1,5 @@
 from pydantic import SecretStr
-from typer import Typer, Option, Argument
-from rich import print as rprint
+from typer import Typer, Option, Context
 
 from config import LlmConfig, EmailProvider, EmailConfig, LlmProvider
 from agent.agent import Majo
@@ -8,12 +7,9 @@ from agent.agent import Majo
 app = Typer(pretty_exceptions_show_locals=False)
 
 
-@app.command()
-def agent(
-    query: str = Argument(
-        ...,
-        help="The query to interact with the agent. E.g.: 'Have I received emails from the company's CEO?'",
-    ),
+@app.callback()
+def main(
+    ctx: Context,
     llm_provider: LlmProvider = Option(
         ...,
         help="The large language model provider",
@@ -48,20 +44,37 @@ def agent(
         prompt=True,
     ),
 ):
-    llm_config = LlmConfig(
+    llm_config: LlmConfig = LlmConfig(
         PROVIDER=llm_provider,
         API_KEY=SecretStr(llm_api_key),
         MODEL=llm_model,
     )
-
-    email_config = EmailConfig(
+    email_config: EmailConfig = EmailConfig(
         PROVIDER=email_provider,
         EMAIL_ADDRESS=email_address,
         PASSWORD=SecretStr(email_password),
     )
 
-    agent = Majo(llm_config=llm_config)
-    rprint(agent.invoke(query))
+    agent: Majo = Majo(llm_config=llm_config)
+
+    ctx.meta["AGENT"] = agent
+
+
+@app.command()
+def inbox_report(
+    ctx: Context,
+    max_emails: int = Option(
+        50,
+        help="The maximum number of emails to report.",
+        prompt=False,
+    ),
+):
+    """
+    Generate a report of the emails in your inbox that you haven't yet read, organizing them by priority level.
+    """
+    agent: Majo = ctx.meta["AGENT"]
+    agent.get_inbox_report(max_emails=max_emails)
+
 
 if __name__ == "__main__":
     app()
