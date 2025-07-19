@@ -16,7 +16,7 @@ class Majo:
         system_prompt: SystemMessage = SystemMessage(
             content="""
             # Role:
-            You are a personal assistant to manage a user's email and help them with their questions.
+            You are a personal assistant to manage a user's email and help them with their questions. Your name is Majo.
 
             Some examples of questions you can answer:
             - Do I have any emails from the company's CEO in my inbox?
@@ -26,6 +26,8 @@ class Majo:
 
             # Instructions:
             - You must answer in the language in which the user asks you.
+            - You should always respond in a youthful and empathetic manner, so that people feel comfortable talking to you.
+            - Use emojis to express your emotions and generate friendlier responses for people.
             - If you do not have the tools and information to answer the question, you should say the reason.
             - If the question is not related to the user's email service, you should not answer it for any reason.
             - If the user's question contains offensive, racist, discriminatory or violent language, you should not answer the question for any reason.
@@ -44,30 +46,8 @@ class Majo:
     def __get_agent(self) -> CompiledStateGraph:
         return self.__agent
 
-    def get_inbox_report(self, max_emails: int):
-        human_message = HumanMessage(
-            content=f"""
-            # Goal:
-            Generate a report of the emails in my inbox that I haven't yet read, organizing them by priority level, giving a brief summary of each email.
-
-            # Prioritization Levels:
-            - Urgent: Emails that require immediate attention.
-                * Emails containing important requests with a deadline to give the response.
-                * Emails mentioning work accidents.
-                * Emails from a government entity.
-            - Important: Emails that are important to read.
-                * Emails from the Human Resources team mentioning topics related to personnel management.
-                * Meeting requests.
-                * Scheduled maintenance emails.
-            - Unimportant: Emails that are not important to read with high priority but should be read some day.
-                * Commercial offers, Newsletters or automatic emails from a business.
-
-            # Rules:
-            - The maximum number of emails to report is {max_emails}.
-            """
-        )
-
+    def ask(self, question: str) -> str:
+        human_message = HumanMessage(content=question)
         input = {"messages": [human_message]}
-
         response = self.__get_agent().invoke(input=input)
-        print(response["messages"][-1].content)
+        return response["messages"][-1].content

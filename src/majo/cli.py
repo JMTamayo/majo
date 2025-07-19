@@ -1,5 +1,6 @@
 from pydantic import SecretStr
-from typer import Typer, Option, Context
+from typer import Typer, Option, Context, Argument
+from rich import print as rprint
 
 from config import LlmConfig, EmailProvider, EmailConfig, LlmProvider
 from agent.agent import Majo
@@ -61,19 +62,16 @@ def main(
 
 
 @app.command()
-def inbox_report(
+def ask(
     ctx: Context,
-    max_emails: int = Option(
-        50,
-        help="The maximum number of emails to report.",
-        prompt=False,
-    ),
+    question: str = Argument(..., help="The question to ask Majo."),
 ):
     """
-    Generate a report of the emails in your inbox that you haven't yet read, organizing them by priority level.
+    Talk to Majo making a question about your email account service
     """
     agent: Majo = ctx.meta["AGENT"]
-    agent.get_inbox_report(max_emails=max_emails)
+    response: str = agent.ask(question=question)
+    rprint(response)
 
 
 if __name__ == "__main__":

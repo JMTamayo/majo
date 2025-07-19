@@ -6,17 +6,17 @@ readme = "README.md"
 requires-python = ">=3.13"
 
 dependencies = [
-    "pydantic[email]>=2.11.7",
-    "pydantic-settings>=2.10.1",
-    "typer>=0.16.0",
-    "langchain>=0.3.26",
-    "langchain-google-genai>=2.1.7",
-    "langgraph>=0.5.2",
+    "pydantic[email]==2.11.7",
+    "pydantic-settings==2.10.1",
+    "typer==0.16.0",
+    "langchain==0.3.26",
+    "langchain-google-genai==2.1.8",
+    "langgraph==0.5.3",
 ]
 
 [dependency-groups]
 dev = [
-    "mypy>=1.16.1",
-    "pytest>=8.4.1",
-    "ruff>=0.12.3",
+    "mypy==1.17.0",
+    "pytest==8.4.1",
+    "ruff==0.12.4",
 ]
