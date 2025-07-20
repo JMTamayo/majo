@@ -4,13 +4,21 @@ version = "0.1.0-alpha.1"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
+
 dependencies = [
-    "typer>=0.16.0",
+    "pydantic[email]==2.11.7",
+    "pydantic-settings==2.10.1",
+    "typer==0.16.0",
+    "langchain==0.3.26",
+    "langchain-google-genai==2.1.8",
+    "langgraph>=0.5.3",
+    "grandalf>=0.8",
 ]
 
 [dependency-groups]
 dev = [
-    "mypy>=1.16.1",
-    "pytest>=8.4.1",
-    "ruff>=0.12.2",
+    "isort==6.0.1",
+    "ruff==0.12.4",
+    "mypy==1.17.0",
+    "pytest==8.4.1",
 ]
