@@ -1,9 +1,9 @@
-from pydantic import SecretStr
-from typer import Typer, Option, Context, Argument
-from rich import print as rprint
+from pathlib import Path
 
-from config import LlmConfig, EmailProvider, EmailConfig, LlmProvider
 from agent.agent import Majo
+from config import EmailConfig, EmailProvider, LlmConfig, LlmProvider
+from pydantic import SecretStr
+from typer import Context, Option, Typer
 
 app = Typer(pretty_exceptions_show_locals=False)
 
@@ -56,7 +56,7 @@ def main(
         PASSWORD=SecretStr(email_password),
     )
 
-    agent: Majo = Majo(llm_config=llm_config)
+    agent: Majo = Majo(llm_config=llm_config, email_config=email_config)
 
     ctx.meta["AGENT"] = agent
 
@@ -64,14 +64,51 @@ def main(
 @app.command()
 def ask(
     ctx: Context,
-    question: str = Argument(..., help="The question to ask Majo."),
+    question: str = Option(
+        None,
+        help="The question to ask Majo. You can use this option to make a simple one-shot question.",
+    ),
+    file: Path = Option(
+        None,
+        help="""
+        The path to the file containing the question.
+        You can use this option to pass a more complex question that you want to reuse in the future.
+        """,
+        exists=True,
+        dir_okay=False,
+        file_okay=True,
+        readable=True,
+        resolve_path=True,
+    ),
 ):
     """
-    Talk to Majo making a question about your email account service
+    Ask a question to Majo, your personal assistant.
+    You can pass the question as an argument, a path to a file or make it interactively.
     """
+
+    try:
+        if question and file:
+            raise ValueError(
+                "You can only submit one of the arguments: a question or a file"
+            )
+
+        agent: Majo = ctx.meta["AGENT"]
+        agent.ask(question or file)
+
+    except KeyboardInterrupt:
+        return
+
+
+@app.command()
+def graph(
+    ctx: Context,
+):
+    """
+    Print the graph of the agent.
+    """
+
     agent: Majo = ctx.meta["AGENT"]
-    response: str = agent.ask(question=question)
-    rprint(response)
+    agent.print_graph()
 
 
 if __name__ == "__main__":
