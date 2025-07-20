@@ -122,3 +122,31 @@ class AgentConsole:
             ),
         )
         self.get_console().line()
+
+
+def print_error(message: str) -> None:
+    """
+    Print an error message to the console.
+
+    Arguments:
+        message (str): The message to print.
+
+    Returns:
+        None: The function does not return anything, it prints the error message to the console.
+    """
+    console = Console()
+
+    title = Text("⚠️  Error", style="red")
+
+    error_message = Text(f"\n{message}\n", style="red")
+    console.print(
+        Panel(
+            error_message,
+            title=title,
+            title_align="left",
+            border_style="red",
+            width=int(console.width * 0.8),
+            expand=False,
+        ),
+        justify="left",
+    )
