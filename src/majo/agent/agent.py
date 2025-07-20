@@ -201,5 +201,3 @@ class Majo:
                 self.get_console().print_user_request(str(message.content))
             else:
                 self.get_console().print_agent_response(str(message.content))
-
-        self.print_graph()
