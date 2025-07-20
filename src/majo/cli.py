@@ -2,8 +2,9 @@ from pathlib import Path
 
 from agent.agent import Majo
 from config import EmailConfig, EmailProvider, LlmConfig, LlmProvider
+from console import print_error
 from pydantic import SecretStr
-from typer import Context, Option, Typer
+from typer import Context, Exit, Option, Typer
 
 app = Typer(pretty_exceptions_show_locals=False)
 
@@ -45,20 +46,25 @@ def main(
         prompt=True,
     ),
 ):
-    llm_config: LlmConfig = LlmConfig(
-        PROVIDER=llm_provider,
-        API_KEY=SecretStr(llm_api_key),
-        MODEL=llm_model,
-    )
-    email_config: EmailConfig = EmailConfig(
-        PROVIDER=email_provider,
-        EMAIL_ADDRESS=email_address,
-        PASSWORD=SecretStr(email_password),
-    )
+    try:
+        llm_config: LlmConfig = LlmConfig(
+            PROVIDER=llm_provider,
+            API_KEY=SecretStr(llm_api_key),
+            MODEL=llm_model,
+        )
+        email_config: EmailConfig = EmailConfig(
+            PROVIDER=email_provider,
+            EMAIL_ADDRESS=email_address,
+            PASSWORD=SecretStr(email_password),
+        )
 
-    agent: Majo = Majo(llm_config=llm_config, email_config=email_config)
+        agent: Majo = Majo(llm_config=llm_config, email_config=email_config)
 
-    ctx.meta["AGENT"] = agent
+        ctx.meta["AGENT"] = agent
+
+    except Exception as e:
+        print_error(str(e))
+        raise Exit(code=1)
 
 
 @app.command()
@@ -97,6 +103,9 @@ def ask(
 
     except KeyboardInterrupt:
         return
+
+    except Exception as e:
+        print_error(str(e))
 
 
 @app.command()
